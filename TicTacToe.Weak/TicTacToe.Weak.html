@@ -1,0 +1,334 @@
+<!--
+Copyright (c) Zlatko Michailov
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<html>
+    <head>
+        <title>Tic Tac Toe</title>
+        <script lang="javascript">
+
+            var userSymbol = "X";
+            var computerSymbol = "O";
+            var isGameOver = false;
+            
+            /**
+             * Prints a debug message for the developer to track the execution path and variable state. 
+             */
+            function debug(message) {
+                document.getElementById("debug").innerHTML += message + "<br/>";
+            }
+            
+            /**
+             * Prints a message for the user/player.
+             */
+            function print(message) {
+                document.getElementById("output").innerHTML += "<b>" + message + "</b>" + "<br/>";
+            }
+            
+            /**
+             * Gets the symbol at a given location in the play matrix. 
+             */
+            function getSymbol(rowIndex, colIndex) {
+                return document.getElementById(rowIndex + "_" + colIndex).innerText;
+            }
+            
+            /**
+             * Sets the symbol at a given location in the play matrix. 
+             */
+            function setSymbol(rowIndex, colIndex, symbol) {
+                document.getElementById(rowIndex + "_" + colIndex).innerText = symbol;
+            }
+            
+            /**
+             * Scans the play matrix for a line (row, column, or diagonal) with the given number of the given symbol.
+             * Supported values for targetCount are 3 and 2.
+             * Returns an object with the following schema:
+             *     kind - the kind of line where the target was hit: 
+             *            "R" (row), "C" (column), "MD" (main diagonal), "OD" (opposite diagonal), "F" (failed).
+             *     rowIndex - depends on kind; see the comments inside for the meaning of this value. 
+             *     colIndex - depends on kind; see the comments inside for the meaning of this value. 
+             */
+            function scanMatrix(targetSymbol, targetCount) {
+                var otherSymbol = targetSymbol == userSymbol ? computerSymbol : userSymbol;
+                var count = -1;
+                var index = -1;
+                
+                // Check each row.
+                for (var rowIndex = 0; rowIndex < 3; rowIndex++) {
+                    count = 0;
+                    for (var colIndex = 0; colIndex < 3; colIndex++) {
+                        if (getSymbol(rowIndex, colIndex) == otherSymbol) {
+                            count = -1;
+                            break;
+                        }
+                        else if (getSymbol(rowIndex, colIndex) == targetSymbol) {
+                            count++;
+                        }
+                        else {
+                            index = colIndex;
+                        }
+                    }
+                    
+                    if (count == targetCount) {
+                        // kind: row.
+                        // rowIndex: the row that satisfies the condition.
+                        // colIndex: the column that is eventually empty.
+                        return { "kind": "R", "rowIndex": rowIndex, "colIndex": index };
+                    } 
+                }
+                
+                // Check each column.
+                for (var colIndex = 0; colIndex < 3; colIndex++) {
+                    count = 0;
+                    for (var rowIndex = 0; rowIndex < 3; rowIndex++) {
+                        if (getSymbol(rowIndex, colIndex) == otherSymbol) {
+                            count = -1;
+                            break;
+                        }
+                        else if (getSymbol(rowIndex, colIndex) == targetSymbol) {
+                            count++;
+                        }
+                        else {
+                            index = rowIndex;
+                        }
+                    }
+                    
+                    if (count == targetCount) {
+                        // kind: column.
+                        // rowIndex: the row that is eventually empty.
+                        // colIndex: the column that satisfies the condition.
+                        return { "kind": "C", "rowIndex": index, "colIndex": colIndex };
+                    } 
+                }
+                
+                // Check the "main" diagonal.
+                count = 0;
+                for (var diagIndex = 0; diagIndex < 3; diagIndex++) {
+                    if (getSymbol(diagIndex, diagIndex) == otherSymbol) {
+                        count = -1;
+                        break;
+                    }
+                    else if (getSymbol(diagIndex, diagIndex) == targetSymbol) {
+                        count++;
+                    }
+                    else {
+                        index = diagIndex;
+                    }
+                }
+                
+                if (count == targetCount) {
+                    // kind: main diagonal.
+                    // rowIndex: the row that is eventually empty..
+                    // colIndex: the column that is eventually empty.
+                    return { "kind": "MD", "rowIndex": index, "colIndex": index };
+                } 
+                
+                // Check the "opposite" diagonal.
+                count = 0;
+                for (var diagIndex = 0; diagIndex < 3; diagIndex++) {
+                    if (getSymbol(diagIndex, 2 - diagIndex) == otherSymbol) {
+                        count = -1;
+                        break;
+                    }
+                    else if (getSymbol(diagIndex, 2 - diagIndex) == targetSymbol) {
+                        count++;
+                    }
+                    else {
+                        index = diagIndex;
+                    }
+                }
+                
+                if (count == targetCount) {
+                    // kind: opposite diagonal.
+                    // rowIndex: the row that is eventually empty..
+                    // colIndex: the column that is eventually empty.
+                    return { "kind": "OD", "rowIndex": index, "colIndex": 2 - index };
+                } 
+                
+                // The target was not achieved.
+                // kind: failed.
+                return { "kind": "F" };
+            }
+            
+            /**
+             * Checks whether a player has won.
+             * Returns true if the given player has won.
+             */
+            function hasPlayerWon(playerSymbol) {
+                var result = scanMatrix(playerSymbol, 3);
+                return result.kind != "F";
+            }
+            
+            /**
+             * Tries to record the user's move.
+             * Returns true if the computer has to respond with a move.
+             */
+            function tryMakeUserMove(rowIndex, colIndex) {
+                // If the game is over, reject the move.
+                if (isGameOver) {
+                    print ("The game is over. You may want to start a new game.");
+                    return false;
+                }
+                
+                // If the cell is already taken, reject the move.
+                var oldSymbol = getSymbol(rowIndex, colIndex);
+                if (oldSymbol == userSymbol || oldSymbol == computerSymbol) {
+                    print ("This move is not valid. Please try again.");
+                    return false;
+                }
+                
+                // Record the move.
+                setSymbol(rowIndex, colIndex, userSymbol);
+
+                // Check whether this was a winning move.
+                if (hasPlayerWon(userSymbol)) {
+                    print ("Congratulations! You won!");
+                    isGameOver = true;
+                    return false;
+                }
+                
+                return true;
+            }
+            
+            /**
+             * Tries to find a winning move for the computer.
+             * Returns true if such a move was found.
+             */
+            function tryWin() {
+                // Try to find a line with 2 computer symbols and an empty cell.
+                var result = scanMatrix(computerSymbol, 2);
+                if (result.kind != "F") {
+                    setSymbol(result.rowIndex, result.colIndex, computerSymbol);
+                    print ("Sorry, you lost!");
+                    isGameOver = true;
+                    return true;
+                }
+                
+                return false;
+            }
+            
+            /**
+             * Tries to defend from a winning line for the user.
+             * Returns true if such a move was found. 
+             */
+            function tryDefend() {
+                // Try to find a line with 2 user symbols and an empty cell.
+                var result = scanMatrix(userSymbol, 2);
+                if (result.kind != "F") {
+                    setSymbol(result.rowIndex, result.colIndex, computerSymbol);
+                    return true;
+                }
+                
+                return false;
+            }
+            
+            /**
+             * Tries to find an attacking move for the computer.
+             * This is a weak strategy, but it's simple for a beginner programmer to understand.
+             * Tries all the cells in a given order (the center, the corners, the middles), and
+             * picks the first available cell.
+             */
+            function tryAttack() {
+                var choices = [
+                    // Center
+                    { "rowIndex": 1, "colIndex": 1 },
+                    
+                    // Corners
+                    { "rowIndex": 0, "colIndex": 0 },
+                    { "rowIndex": 0, "colIndex": 2 },
+                    { "rowIndex": 2, "colIndex": 0 },
+                    { "rowIndex": 2, "colIndex": 2 },
+                    
+                    // Middles
+                    { "rowIndex": 0, "colIndex": 1 },
+                    { "rowIndex": 1, "colIndex": 0 },
+                    { "rowIndex": 1, "colIndex": 2 },
+                    { "rowIndex": 2, "colIndex": 1 },
+                ];
+                
+                // Try the choices in the given order.
+                // Pick the first available cell.
+                for (var i = 0; i < choices.length; i++) {
+                    var choice = choices[i];
+                    var symbol = getSymbol(choice.rowIndex, choice.colIndex);
+                    if (symbol != userSymbol && symbol != computerSymbol) {
+                        setSymbol(choice.rowIndex, choice.colIndex, computerSymbol);
+                        return true;
+                    }
+                }
+                
+                debug("Program error - all possible choices were exhausted without finding a good one.")
+                return false;
+            }
+            
+            /**
+             * Try to make a move for the computer.
+             * Returns true if a move was made.
+             */
+            function tryMakeComputerMove() {
+                if (tryWin()) return true;
+                
+                if (tryDefend()) return true;
+                
+                return tryAttack();
+            }
+            
+            /**
+             * Event handler - the user has clicked on a cell.
+             * Tries to record the user's move, and unless the game is over, tries to make a computer move.
+             */
+            function clicked(rowIndex, colIndex) {
+                debug("User cliecked on [" + rowIndex + "," + colIndex + "]");
+                
+                if (tryMakeUserMove(rowIndex, colIndex)) {
+                    tryMakeComputerMove()
+                }
+            }
+
+        </script>
+        <style>
+            td {
+                font-family: Courier New, Courier, monospace;
+                font-size: 80pt;
+            }
+        </style>
+    </head>
+    <body>
+        <table border="3">
+            <tr>
+                <td id="0_0" onclick="clicked(0,0)">&nbsp;</td>
+                <td id="0_1" onclick="clicked(0,1)">&nbsp;</td>
+                <td id="0_2" onclick="clicked(0,2)">&nbsp;</td>
+            </tr>
+            <tr>
+                <td id="1_0" onclick="clicked(1,0)">&nbsp;</td>
+                <td id="1_1" onclick="clicked(1,1)">&nbsp;</td>
+                <td id="1_2" onclick="clicked(1,2)">&nbsp;</td>
+            </tr>
+            <tr>
+                <td id="2_0" onclick="clicked(2,0)">&nbsp;</td>
+                <td id="2_1" onclick="clicked(2,1)">&nbsp;</td>
+                <td id="2_2" onclick="clicked(2,2)">&nbsp;</td>
+            </tr>
+        </table>
+        
+        <br/><br/>
+        <div id="output"></div>
+        
+        <br/><br/>
+        <div id="debug"></div>
+    </body>
+</html>
+    
