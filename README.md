@@ -1,35 +1,44 @@
 # Kids Repository
-
 Copyright (c) Zlatko Michailov
 
-This repository contains various (not necessarily related) projects whose 
-purpose is to teach kids how to program.
+This repository contains fun projects that teach kids how to program.
 
-Each project is implemented in JavaScript contained in a single HTML page.
-This platform was chosen for its simplicity and self-sufficiency - 
-no compilation is needed to run the programs.    
+Each project is implemented using __JavaScript__ contained in a single HTML page.
 
-Key tenets in these projects are _simplicity_ and _cleanness_ of the code.
-It is known that the UI is quite edgy.
-The goal has been to show the code, not the UI, to young programmers. 
+The UI is quite edgy.
+The focus has been on the _code_, not on the UI.
 
-The projects from this repository are listed here in order of increased complexity:
+Feel free to suggest other simple and fun projects by filing issues. 
 
 
-## CodeBreaker.Sole
 
-(Coming soon.)
+## Basic Level
+These projects require knowledge on variables, functions, conditions, loops, and arrays.
+
+### CodeBreaker.Sole
+(__Coming soon.__)
+
+This project implements a simplified version of the popular paper-and-pencil game 
+[Bulls and Cows](https://en.wikipedia.org/wiki/Bulls_and_Cows).
+
+Game limitations:
+- The user is the sole code breaker. The computer is only a code maker.
 
 
-## TicTacToe.Weak
 
-[Try it now.](TicTacToe.Weak/TicTacToe.Weak.html)
+## Intermediate level
+These projects involve _nesting_ of the basic programming elements - 
+conditions, loops, and function calls. 
 
-This project implements the popular paper-and-pencil game.
+### TicTacToe.Weak
+[__Try it now.__](TicTacToe.Weak/TicTacToe.Weak.html)
 
-There are some game limitations for the sake of simplicity: 
-* The user always has the first move.
-* The user always uses the "X" symbol.
+This project implements the popular paper-and-pencil game
+[Tic Tac Toe](https://en.wikipedia.org/wiki/Tic-tac-toe).
+
+Game limitations: 
+- The user always has the first move.
+- The user always uses the "X" symbol.
 
 As the name suggests, this program implements a weak algorithm -
 it picks the first available cell probing the center first, then the corners,
@@ -37,12 +46,24 @@ and lastly the middles.
 This weak algorithm was favored for its simplicity over the more complex 
 _minimax_ algorithm which is implemented by [TicTacToe.Strong](#TicTacToe.Strong).
  
- 
-## TicTacToe.Strong
-
-(Coming soon.)
 
 
-## CodeBreaker.Compete
+## Advanced Level 
+These projects use _recursion_.
 
-(Coming soon.)
+### TicTacToe.Strong
+(__Coming soon.__)
+
+This project implements the same game that [TicTacToe.Weak](#TicTacToe.Weak) does with the same limitations. 
+The difference is that this project uses a recursive, _minimax_, algorithm to chose the best move.
+
+
+
+## Pro Level
+These projects involve complex logic.
+
+### CodeBreaker.Compete
+(__Coming later.__)
+
+This project implements the same game that [CodeBreaker.Sole](#CodeBreaker.Sole) does with the same limitations. 
+The difference is that the game is in _competition_ mode - the computer makes moves against the user.
