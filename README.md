@@ -44,7 +44,7 @@ As the name suggests, this program implements a weak algorithm -
 it picks the first available cell probing the center first, then the corners,
 and lastly the middles.
 This weak algorithm was favored for its simplicity over the more complex 
-_minimax_ algorithm which is implemented by [TicTacToe.Strong](#TicTacToe.Strong).
+_minimax_ algorithm which is implemented by [TicTacToe.Strong](#TicTacToeStrong).
  
 
 
@@ -54,8 +54,16 @@ These projects use _recursion_.
 ### TicTacToe.Strong
 (__Coming soon.__)
 
-This project implements the same game that [TicTacToe.Weak](#TicTacToe.Weak) does with the same limitations. 
+This project implements the same game that [TicTacToe.Weak](#TicTacToeWeak) does with the same limitations. 
 The difference is that this project uses a recursive, _minimax_, algorithm to chose the best move.
+
+
+### ConnectFour.Strong
+(__Coming later.__)
+
+This project implements the popular board game
+[Connect Four](https://en.wikipedia.org/wiki/Connect_Four).
+It uses a recursive, _minimax_, algorithm to chose the best move.
 
 
 
