@@ -1,0 +1,202 @@
+<!--
+Copyright (c) Zlatko Michailov
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<html>
+    <head>
+        <title>Code Breaker (Sole)</title>
+        <script lang="javascript">
+
+            var CodeLength = 4;
+            var AsciiOf0 = "0".charCodeAt(0); 
+            
+            var isGameOver = false;
+            var computerCode = [];
+            
+            /**
+             * Prints a debug message for the developer to track the execution path and variable state. 
+             */
+            function debug(message) {
+                document.getElementById("debug").innerHTML += message + "<br/>";
+            }
+            
+            /**
+             * Prints a message for the user/player.
+             */
+            function print(message) {
+                document.getElementById("output").innerHTML += "<b>" + message + "</b>" + "<br/>";
+            }
+            
+            /**
+             * Checks whether the user's move is valid.
+             * Returns true if the move is valid.
+             */
+            function isMoveValid(guess) {
+                // Check length.
+                if (guess.length != CodeLength) {
+                    return false;
+                }
+                
+                // Check each character.
+                for (var i = 0; i < CodeLength; i++) {
+                    var ch = guess.charAt(i); 
+                    //debug("guess[" + i + "] = " + ch);
+                    
+                    // Must be '0'..'9'.
+                    if (ch < '0' || '9' < ch) {
+                        return false;
+                    }
+                    
+                    // Must be unique.
+                    if (guess.indexOf(ch) != i) {
+                        return false;
+                    }
+                }
+                
+                // There are no violations.
+                return true;
+            }
+            
+            /**
+             * Evaluates a user's move in terms of "bulls" and "cows", and logs the score.
+             */
+            function evaluateMove(guess) {
+                var bulls = 0;
+                var cows = 0;
+                
+                // Evaluate each digit of the user's guess.
+                for (var i = 0; i < CodeLength; i++) {
+                    var digit = guess.charAt(i); 
+                    var indexOfDigitInCode = computerCode.indexOf(digit);
+                    //debug("i=" + i + ", digit=" + digit + ", indexOfDigitInCode=" + indexOfDigitInCode);
+                    if (indexOfDigitInCode == i) {    
+                        bulls++;
+                    }
+                    else if (indexOfDigitInCode >= 0) {
+                        cows++;
+                    }
+                }
+                
+                // Add a row to the score table.
+                var tableElement = document.getElementById("ScoreTable");
+                var rowElement = document.createElement("tr");
+                
+                var guessElement = document.createElement("td");
+                guessElement.innerText = guess;
+                rowElement.appendChild(guessElement);
+                
+                var bullsElement = document.createElement("td");
+                bullsElement.innerText = bulls;
+                rowElement.appendChild(bullsElement);
+                
+                var cowsElement = document.createElement("td");
+                cowsElement.innerText = cows;
+                rowElement.appendChild(cowsElement);
+                
+                tableElement.appendChild(rowElement);
+                
+                // Check whether the game has ended.
+                if (bulls == CodeLength) {
+                    print("Congratulations, you won!");
+                    isGameOver = true;
+                }
+            }
+            
+            /**
+             * Handles the event of user making a move/guess.
+             */
+            function userMoves() {
+                if (isGameOver) {
+                    print("The game is over. To start a new game, reload the page.");
+                    return;    
+                }
+                
+                var userGuessElement = document.getElementById("UserGuess");
+                var guess = userGuessElement.value;
+                //debug("User guesses: " + guess);
+                
+                if (isMoveValid(guess)) {
+                    evaluateMove(guess);
+                }
+                else {
+                    print("'" + guess + "' is not a valid guess. Please enter " + CodeLength + " different digits.")
+                }
+                
+                userGuessElement.value = null;
+            }
+            
+            /**
+             * Makes a code for the computer.
+             * This function must be called once per game, before the user starts making moves.
+             */
+            function makeComputerCode() {
+                computerCode = [];
+                
+                // We have to make CodeLength digits. 
+                for (var i = 0; i < CodeLength; i++) {
+                    var digit;
+
+                    // We must make a digit, and we must continue trying until the new digit is unique.                    
+                    var mustGetNewDigit = true;
+                    while (mustGetNewDigit) {
+                        // Make a digit as a string (not as a number).
+                        // This is because we'll be comparing to user's guesses which will come as a string.
+                        digit = String.fromCharCode(AsciiOf0 + Math.trunc(10 * Math.random()));
+
+                        // If the new digit has been made already, we must retry.
+                        mustGetNewDigit = computerCode.indexOf(digit) >= 0;
+                    }
+                    
+                    // Append the new digit to the computer code.
+                    computerCode.push(digit);
+                }
+                
+                debug("Computer code: " + computerCode);
+            }
+            
+        </script>
+        <style>
+            td {
+                font-family: Courier New, Courier, monospace;
+            }
+        </style>
+    </head>
+    <body onload="makeComputerCode();">
+        <h1>Code Breaker (Sole)</h1>
+        
+        <!-- User enters moves here. -->
+        <span>Guess code:</span>
+        <input id="UserGuess" type="text" maxlength="4""/>
+        <button onclick="userMoves();">Try</button>
+        <br />
+        <br />
+    
+        <!-- Moves are logged here. -->    
+        <table id="ScoreTable" border="1">
+            <tr>
+                <td>Guess</td>
+                <td>B</td>
+                <td>C</td>
+            </tr>
+        </table>
+        
+        <br/><br/>
+        <div id="output"></div>
+        
+        <br/><br/>
+        <div id="debug"></div>
+    </body>
+</html>
+    
