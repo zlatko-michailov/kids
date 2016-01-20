@@ -16,7 +16,7 @@ Feel free to suggest other simple and fun projects by filing issues.
 These projects require knowledge on variables, functions, conditions, loops, and arrays.
 
 ### CodeBreaker.Sole
-(__Coming soon.__)
+[__Try it now.__](CodeBreaker.Sole/CodeBreaker.Sole.html)
 
 This project implements a simplified version of the popular paper-and-pencil game 
 [Bulls and Cows](https://en.wikipedia.org/wiki/Bulls_and_Cows).
